@@ -59,11 +59,6 @@ function Extract-Archive {
 			exit 1
 	}
 
-	# Disable file mode changes in git on Windows
-	cd vault
-	git config core.fileMode false
-	cd ..
-
 	if ($hasChanges) {
 			Write-Host "Syncing local changes back to latest vault"
 			robocopy ".old/vault-$timestamp" "vault" /MIR /XD .git > $null

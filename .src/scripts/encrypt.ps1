@@ -6,11 +6,6 @@ function Move-ToProjectRoot {
 
 # Create a tarball of the vault directory
 function Create-Archive {
-	# Unset fileMode
-	cd vault
-	git config --unset core.fileMode
-	cd ..
-
 	tar -czf "vault.tar.gz" "vault"
 	if ($LASTEXITCODE -ne 0) {
 			Write-Host "Failed to create archive"
