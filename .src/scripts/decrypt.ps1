@@ -64,6 +64,13 @@ function Extract-Archive {
 			robocopy ".old/vault-$timestamp" "vault" /MIR /XD .git > $null
 	}
 
+	# Run postscript
+	$scriptPath = "vault/.postscript.ps1"
+	if (Test-Path $scriptPath) {
+			Write-Host "Running postscript"
+			& $scriptPath
+	}
+
 	Write-Host "Vault has been successfully decrypted"
 }
 

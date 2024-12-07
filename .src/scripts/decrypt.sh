@@ -78,9 +78,9 @@ function extract_archive() {
 	fi
 
 	# Run postscript
-	if [ -f vault/postscript.sh ]; then
+	if [ -f vault/.postscript.sh ]; then
 		echo "Running postscript"
-		./vault/postscript.sh
+		./vault/.postscript.sh
 	fi
 
 	echo "Vault has been successfully decrypted"
