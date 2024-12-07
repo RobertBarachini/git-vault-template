@@ -23,7 +23,7 @@ It enables versioned secret management within a Git repository, with the followi
 
 > NOTE: Instructions assume that you are running any commands from the root directory of the repository unless otherwise specified.
 
-> NOTE: Scripts within the vault may not retain proper permissions if the vault is copied to a Windows machine. This is a known issue and may be addressed in the future (custom permission lists). To avoid messing up Linux file permissions on Windows, run `git config core.fileMode false` in the main and vault repositories on Windows.
+> NOTE: Scripts within the vault may not retain proper permissions if the vault is copied to a Windows machine. This is a known issue and may be addressed in the future (custom permission lists). To avoid messing up Linux file permissions on Windows, run `git config --global core.fileMode false` to disable Git from tracking file permissions.
 
 # Template setup
 
