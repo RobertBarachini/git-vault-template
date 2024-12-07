@@ -1,13 +1,20 @@
 {
 	"configurations": [
-	{
-		"type": "bashdb",
-		"request": "launch",
-		"name": "Bash-Debug (current file)",
-		"cwd": "${workspaceFolder}",
-		"program": "${file}",
-		"terminalKind": "integrated",
-		"args": []
-	}
+		{
+			"type": "bashdb",
+			"request": "launch",
+			"name": "Bash-Debug (current file)",
+			"cwd": "${workspaceFolder}",
+			"program": "${file}",
+			"terminalKind": "integrated",
+			"args": []
+		},
+		{
+			"name": "PowerShell (current file)",
+			"type": "PowerShell",
+			"request": "launch",
+			"script": "${file}",
+			"cwd": "${cwd}"
+		},
 	]
 }

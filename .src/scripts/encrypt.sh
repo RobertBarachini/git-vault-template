@@ -10,6 +10,10 @@ function move_to_project_root() {
 # Create a tarball of the vault directory
 function create_archive() {
 	tar -czf vault.tar.gz vault
+	if [ $? -ne 0 ]; then
+		echo "Failed to create the archive"
+		exit 1
+	fi
 }
 
 # Encrypt the archive using AES-256-CTR

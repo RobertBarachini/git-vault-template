@@ -16,7 +16,7 @@ function has_changes() {
 	cd vault
 	
 	# If the vault directory is not a git repository, assume no changes
-	if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+	if [ ! -d .git ]; then
 		cd ..
 		return 1
 	fi
@@ -76,6 +76,9 @@ function extract_archive() {
 		echo "Syncing local changes back to latest vault"
 		rsync -a --exclude='.git' ".old/vault-$timestamp" vault/
 	fi
+
+	# Run postscript
+	# TODO
 
 	echo "Vault has been successfully decrypted"
 }
