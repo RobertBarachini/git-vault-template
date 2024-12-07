@@ -23,7 +23,7 @@ It enables versioned secret management within a Git repository, with the followi
 
 > NOTE: Instructions assume that you are running any commands from the root directory of the repository unless otherwise specified.
 
-> NOTE: Scripts within the vault may not retain proper permissions if the vault is copied to a Windows machine. This is a known issue and may be addressed in the future (custom permission lists).
+> NOTE: Files within the vault may not retain proper permissions if the vault is copied to a Windows machine. This is a known issue and may be addressed in the future (custom permission lists). Currently the best way to handle this is to ensure that files have `644` instead of `755` permissions. If you need to run further scripts outside of `vault/.postscript.sh` and track the changes without Windows wiping out the permissions, just change their execution to allow execution `chmod +x <some-executable>`, run it, and then change the permissions back by running `chmod 644 <some-executable>`. This has already been handled for `postscript.sh` in `decrypt.sh`. `decrypt.sh` and other files within the root repository don't need to be maintained this way as Git already tracks the executable bit in some contexts if `fileMode` is set to `true` in the Git configuration (default).
 
 # Template setup
 
