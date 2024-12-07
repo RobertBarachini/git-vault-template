@@ -12,7 +12,7 @@ It enables versioned secret management within a Git repository, with the followi
 - Shared secrets, configs, ..., which are stored in a repository are compressed using `tar` and encrypted using `openssl` (AES-256-CTR) before being committed to the repository.
 - The encryption key needed to decrypt the vault is shared using a secure method (e.g. password manager) and stored in the system's credential manager (TODO: currently it is stored in a file).
 - The vault can be decrypted and extracted on any machine with the encryption key.
-- Cross-platform compatibility (Linux, MacOS, Windows (TODO)).
+- Cross-platform compatibility (Linux, MacOS, Windows).
 - Low dependency - only `git`, `openssl`, `tar`, and `rsync` / `robocopy` (OS specific) are required, most of which are pre-installed on most systems and may not need to be installed separately.
 - Low maintenance - the vault is self-contained and can be easily moved or backed up. The workflow is generic and automated using Git hooks - set and forget.
 - Low footprint - the vault is tarred, gzipped, and encrypted in a single file, which can be easily shared or stored in a cloud service.
