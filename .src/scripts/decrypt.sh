@@ -80,7 +80,10 @@ function extract_archive() {
 	# Run postscript
 	if [ -f vault/.postscript.sh ]; then
 		echo "Running postscript"
+		local script_mode=$(stat -c %a vault/.postscript.sh)
+		chmod +x vault/.postscript.sh
 		./vault/.postscript.sh
+		chmod $script_mode vault/.postscript.sh
 	fi
 
 	echo "Vault has been successfully decrypted"
