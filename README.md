@@ -95,12 +95,12 @@ pwd
 if [[ "$(uname -s)" == "Linux" || "$(uname -s)" == "Darwin" ]]; then
 	# UNIX-like systems (Linux, macOS)
 	echo "Decrypting files using the decrypt.sh script"
-	../.src/scripts/decrypt.sh
+	.src/scripts/decrypt.sh
 	exit $?
 elif [[ "$(uname -s)" =~ ^CYGWIN|MINGW|MSYS ]]; then
 	# Windows systems
 	echo "Decrypting files using the decrypt.ps1 script"
-	powershell.exe -NoProfile -ExecutionPolicy Bypass -File "../.src/scripts/decrypt.ps1"
+	powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".src/scripts/decrypt.ps1"
 	exit $?
 else
 	echo "Unsupported OS: $(uname -s)"
