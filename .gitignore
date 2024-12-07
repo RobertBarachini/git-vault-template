@@ -1,0 +1,17 @@
+# Ignored folders (local notes, vault, etc.)
+.private/
+vault/
+.old/
+
+# Temporary files
+*.7z
+*.gz
+*.log
+*.tar
+*.temp
+*.tmp
+*.zip
+
+# Sensitive files
+.key
+key
