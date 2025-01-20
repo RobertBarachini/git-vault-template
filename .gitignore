@@ -1,6 +1,7 @@
 # Ignored folders (local notes, vault, etc.)
 .private/
 vault/
+local/
 .old/
 
 # Temporary files

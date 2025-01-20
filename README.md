@@ -4,6 +4,8 @@ This repository is a template for creating low-dependency, encrypted, nested Git
 
 Currently fully functional on Linux and MacOS, and Windows.
 
+Original repository (check if looking for updates): [git-vault-template](https://github.com/RobertBarachini/git-vault-template)
+
 ## Details
 
 It enables versioned secret management within a Git repository, with the following characteristics:
@@ -43,8 +45,8 @@ It enables versioned secret management within a Git repository, with the followi
 2. Run `rm -rf .git` to remove the Git history.
 3. Run `git init -b main` to initialize a new Git repository.
 4. Delete any files you don't need (such as the `.vscode` directory).
-5. Create a strong `.key` file by running `openssl rand 4096 | openssl enc -base64 -A > .key` or `gpg --gen-random --armor 1 4096 > .key` in the root directory.
-6. Delete old encrypted vault by running `rm vault.enc`.
+5. Create a strong `.key` file by running `openssl rand -base64 32 | tr -d '\n' > .key` on UNIX or `openssl rand -base64 32 | Out-File -FilePath .key -NoNewline` on Windows in the root directory. Additional command ensures that the newline character is not added to the file. This is important when sharing the key with others (via copy&paste), as the newline character may be copied along with the key and it can cause decryption issues - this is especially important on cross-platform collaboration as Windows uses different line endings (`\r\n`) than UNIX (`\n`).
+6. Delete old encrypted vault by running `rm vault.enc`. Optionally you can keep the structure of the demo vault by decrypting it and copying the files to the new vault.
 7. Create a new vault folder by running `mkdir vault`.
 8. Init the vault by running `git init -b vault vault`.
 9. Add a one-liner `README.md` to the vault by running `echo '# Vault' > vault/README.md`.
@@ -144,15 +146,155 @@ else
 fi
 ```
 
+## Use cases and examples
+
+Common use case for this vault repository is to store environment variables and share them securely between multiple developers or development environments (such as local development, CI/CD pipelines, staging, and production environments).
+
+Many common public repositories include `.env` files or their templates in their respective repositories. This introduces many security risks and complicates development as keeping these files up to date manually and syncing them between team members can become a hassle. This project reduces the friction by providing a secure way to store and share these files either semi-manually or completely programmatically. All you need to do is to set up the vault once and share the encryption key with the team members (use a shared password manager for that). Other repositories can then reference the vault repository and its `.env` files in their workflows. How can this be achieved?
+
+1. Set up the vault repository as described in the previous sections.
+2. Use the `sample.env` file for example or create your own `.env` file in the vault repository (e.g. `vault/some_service.env`).
+3. Programs, scripts, and services need to know where the vault folder is located to source the `.env` files. This can be achieved by setting an environment variable in the shell or in the CI/CD pipeline. Here are a few examples for different shells:
+
+- **Bash**:
+
+```sh
+# Open the .bashrc file and add the following line
+export MY_PROJECT_VAULT_PATH="/home/user/git/my-project/this-vault"
+# Source the .bashrc file to apply the changes
+source ~/.bashrc
+```
+
+- **Windows PowerShell**:
+
+```ps1
+# Open the $PROFILE file and add the following line
+# you can open it by running `notepad $PROFILE`. If it doesn't exist, create it.
+$env:MY_PROJECT_VAULT_PATH = "C:\Users\user\git\my-project\this-vault"
+# Source the $PROFILE file to apply the changes
+. $PROFILE
+```
+
+- **Zsh**:
+
+```sh
+# Open the .zshrc file and add the following line
+export MY_PROJECT_VAULT_PATH="/home/user/git/my-project/this-vault"
+# Source the .zshrc file to apply the changes
+source ~/.zshrc
+```
+
+- **Fish**:
+
+```sh
+# Open the config.fish file and add the following line
+set -x MY_PROJECT_VAULT_PATH "/home/user/git/my-project/this-vault"
+# Source the config.fish file to apply the changes
+source ~/.config/fish/config.fish
+```
+
+4. Create an environment variable sourcing workflow that suits you best. Following are a couple of examples for different programming languages / technologies.
+
+> **Note:** Local development leverages the `local/` folder (located at this repository's root) for overriding the `.env` files in the vault. This is useful when you want to test changes locally or set up a specific configuration for your development environment (such as database connection strings, API keys, etc.) without affecting the shared vault or interrupting other team members. The `local/` folder is ignored by Git and is not tracked. You can create it and add your `.env` files there. Best practice is to create the same structure as in the vault folder to keep things consistent and only override the necessary values to reduce clutter.
+
+> **Advice:** It is useful to specify the root of your project (`GIT_MY_PROJECT_PATH="..."`), the root of the external vault repository, like below examples (so you can still reference the vault and local folders separately), or the root of your GitLab group (`GIT_TOP_LEVEL_GROUP_NAME="..."` ; ensures you can reference as `$GIT_TOP_LEVEL_GROUP_NAME/vaults/development/vault/some_service.env`) when using the 'env variable pointer' strategy. This way you can easily reference multiple repositories by adding a single key to your environment variables. This can be (in addition to this workflow) used to spin up multiple services or repositories with a single command. The environment variable serves as an absolute path pointer to the root of whatever structure you have set up. Other repositories can then use relative paths after referencing the top level variable to get complete paths of the vault repository or other repositories in the directory structure. This 'env variable pointer' method ensures a consistent workflow which I developed for my personal projects and also integrated into multiple commercial projects.
+
+### Node.js
+
+Node.js commonly leverages the `package.json` file for launching scripts and sourcing environment variables. You can also use the `dotenv` package to load the `.env` files from the vault repository. If you know that you will be running your code on `UNIX` systems exclusively, you can use the following code in your `package.json` file:
+
+```json
+{
+  "scripts": {
+    "dev": ". \"$MY_PROJECT_VAULT_PATH/vault/some_service.env\" && . \"$MY_PROJECT_VAULT_PATH/local/some_service.env\" && nodemon --inspect=0.0.0.0:12345 src/index.js"
+  }
+}
+```
+
+Although the syntax is a bit longer than usual commands and may appear cumbersome, the advantages vastly outweigh the disadvantages in my experience. You set it up once and then it just works. The development speed increases without sacrificing security.
+
+### Python
+
+Python relies on the `python-dotenv` package to load the `.env` files. You can use the following code to load the environment files from the vault in your Python script:
+
+```python
+import os
+
+from dotenv import load_dotenv
+
+filepath_vault = os.path.join(*[os.getenv('MY_PROJECT_VAULT_PATH'), 'vault', 'some_service.env'])
+filepath_local = os.path.join(*[os.getenv('MY_PROJECT_VAULT_PATH'), 'local', 'some_service.env'])
+
+load_dotenv(filepath_vault)
+
+if os.getenv('PYTHON_ENV') == 'development' and os.path.exists(filepath_local):
+	load_dotenv(filepath_local, override=True)
+```
+
+This can also be abstracted into a utility library or a function which receives the name or relative path of the `.env` file and loads it into the environment and if the code is running inside a local environment, also loads the `.env` file from the `local/` directory to override specific variables.
+
+Example:
+
+```python
+# utils.py
+
+import os
+
+from dotenv import load_dotenv
+
+
+def load_env(filename: str):
+	'''
+	Loads the environment variables from the vault and local directories depending on the PYTHON_ENV environment variable.
+	'''
+
+	filepath_vault = os.path.join(*[os.getenv('MY_PROJECT_VAULT_PATH'), 'vault', filename])
+	filepath_local = os.path.join(*[os.getenv('MY_PROJECT_VAULT_PATH'), 'local', filename])
+
+	load_dotenv(filepath_vault)
+
+	if os.getenv('PYTHON_ENV') == 'development' and os.path.exists(filepath_local):
+		load_dotenv(filepath_local, override=True)
+```
+
+```python
+# main.py
+
+from utils import load_env
+
+load_env('some_service.env')
+```
+
+### Docker
+
+I strongly discourage listing environment files when using the `docker run` command as it still doesn't have consistent variable parsing. Instead, use a `docker-compose` file to load the `.env` files and overrides as Docker Compose actually works correctly in this regard. It has other benefits (even for local development) over `docker run` as well. You can use the following code in your `docker-compose.yml` file:
+
+```yaml
+version: "3.9"
+
+services:
+	some_service:
+		env_file:
+			- ${MY_PROJECT_VAULT_PATH}/vault/some_service.env
+			- ${MY_PROJECT_VAULT_PATH}/local/some_service.env
+		# you can still use the environment key to further override the values
+		environment:
+			SOME_SERVICE_ENV_VAR: some_value
+#...
+```
+
 # TODO
 
 - Create a workflow to set a config file with filepaths and their permissions (Windows wipes out permissions when copying files, add them back if necessary as a post-process)
 - Create a template initialization script that sets up the repository with the necessary files and folders from scratch
 - Use system credential manager to store the encryption key
 - Maintenance scripts (clear git history, ...)
+- Try to unify encryption and decryption code to only use shell scripts for cross-platform compatibility (Git bash on Windows)
 
 # DONE
 
+- Write up further instructions, use cases, and examples for multiple programming languages and workflows
+- Update instructions for setting up a new instance from this template
 - Check cross-platform collaboration compatibility
 - Create Windows scripts (check if git bash works out of the box and openssl and tar are installed, use robocopy instead of rsync) -> Git bash relies on WSL... Created `decrypt.ps1` and `encrypt.ps1` scripts instead. Tar and openssl worked out of the box. Robocopy is used instead of rsync.
 - Write README.md
