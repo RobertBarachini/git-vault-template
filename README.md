@@ -74,7 +74,7 @@ These ensure that the vault encryption and decryption lifecycle is seamless and 
 
 Git hook logs can be inspected in VS Code by opening the Output panel and selecting Git from the dropdown menu.
 
-### Autotically decrypt the vault (post-merge hook)
+### Automatically decrypt the vault (post-merge hook)
 
 Ensure that the encrypted vault file is decrypted after every pull or checkout from the root repository by setting up a `post-merge` hook within the root repository by running the following commands:
 
@@ -87,7 +87,7 @@ chmod +x .git/hooks/post-merge # Windows: attrib +x .git\hooks\post-merge or may
 
 Add the following code to the `post-merge` hook:
 
-> NOTE: Some IDEs may hide the .git directory. If you are not comfortable with the command line, you can use the file explorer or if you are using VS Code, you can edit the `.vscode/settings.json` file to show hidden files and directories by adding `"files.exclude": {".git": false}`.
+> NOTE: Some IDEs may hide the .git directory. If you are not comfortable with the command line, you can use the file explorer or if you are using VS Code, you can edit the `.vscode/settings.json` file to show hidden files and directories by adding `"files.exclude": {"**/.git": false}`.
 
 ```sh
 #!/bin/bash
